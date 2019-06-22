@@ -13,19 +13,19 @@ class Store extends React.Component{
       };
   }
 
-  addCount = (number) => {    
-    this.setState(state => ({ count: state.count+number }));
-    console.log(this.state.count)
+  addCount = (number) => {
+    let sum=this.state.count + parseInt(number)
+    this.setState({ count: sum })
   };
 
   render(){
     return (
       <div className="container">
         <div className="row main">
-          <BarraSuperior addCount={this.addCount} count={this.state.count}></BarraSuperior>
+          <BarraSuperior count={this.state.count}></BarraSuperior>
           <div className="row">
               <div className="col m12">
-                  <Catalogo addCount={this.addCount} cartCount={this.state.count}></Catalogo>
+                  <Catalogo addCount={this.addCount.bind(this)}></Catalogo>
               </div>
           </div>
         </div>

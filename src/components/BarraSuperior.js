@@ -6,12 +6,11 @@ class BarraSuperior extends React.Component{
   constructor(props){
       super(props);
       this.state = {
-        count: this.props.count
       }
   }
 
   emptyCart(){
-    if (this.state.count === 0) {
+    if (this.props.count === 0) {
       alert("Carro de compras vacío. Agregue algunos productos primero.");
     }
   }
@@ -24,7 +23,7 @@ class BarraSuperior extends React.Component{
           <ul id="nav-mobile" className="right hide-on-med-and-down">
             <li><Link to='../store'><i className="icon ion-md-apps"></i></Link></li>
             <li><a href="#" onClick={this.emptyCart.bind(this)} className="cart-icon"><i className="icon ion-md-cart"></i>
-              <span className="new badge cart-badge" data-badge-caption="">{this.state.count}</span>
+              <span className="new badge cart-badge" data-badge-caption="">{this.props.count}</span>
             </a></li>
             <li><Link to='/'><i className="icon ion-md-filing"></i></Link></li>
             <li><Link to='/'><i className="icon ion-md-exit"></i></Link></li>

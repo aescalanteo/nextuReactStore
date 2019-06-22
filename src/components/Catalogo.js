@@ -81,7 +81,6 @@ class Catalogo extends React.Component{
   }
 
   alCarrito(cantidad, nombre){
-    debugger;
     let items = this.state.items;
     let stock;
     let index;
@@ -108,9 +107,8 @@ class Catalogo extends React.Component{
         carroJson.push(json);
       }
       items[index].stock = stock - cantidad;
+      this.props.addCount(cantidad);
     }
-
-    this.props.addCount(cantidad);
   }
 
   render(){
