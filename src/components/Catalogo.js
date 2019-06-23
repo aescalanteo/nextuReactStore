@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import Detalle from './Detalle.js';
+import Carro from './Carro.js';
 import '../css/catalogo.css';
 
 class Catalogo extends React.Component{
@@ -8,11 +9,19 @@ class Catalogo extends React.Component{
       super(props);
       this.state = {
         items: [],
-        show: true,
+        show: this.props.show,
         count: 0,
-        detalle: {}
+        detalle: {},
+        carro: []
       }
       this.loadItems();
+      this.carroJson = []
+  }
+
+  cleanCatalog(){
+    this.carroJson = [];
+    this.setState({carro: []});
+    this.props.setCountToZero();
   }
 
   loadItems(){
@@ -22,6 +31,7 @@ class Catalogo extends React.Component{
           response.data[index].number = 1;
         }
         this.setState({items: response.data});
+        this.itemsOriginal = response.data;
     });
   }
 
@@ -70,7 +80,7 @@ class Catalogo extends React.Component{
 
   showDetails(nombre, imagen, precio, stock, e) {
     this.setState({
-      show: false,
+      show: "detalle",
       detalle: {
         nombre: nombre,
         imagen: imagen,
@@ -80,11 +90,24 @@ class Catalogo extends React.Component{
     });
   }
 
+  showCatalogo(){
+    debugger
+    this.setState({
+      show: "catalogo"
+    });
+  }
+
+  showCart(items, e) {
+    this.setState({
+      show: "carro"
+    });
+  }
+
   alCarrito(cantidad, nombre){
     let items = this.state.items;
     let stock;
     let index;
-    let carroJson = [];
+    
     for (var i in items) {
        if (items[i].nombre === nombre) {
            stock = Number(items[i].stock);
@@ -93,44 +116,75 @@ class Catalogo extends React.Component{
     }
 
     if (stock>0 && cantidad<=stock){
-      let obj = carroJson.filter(c => c.nombre.toLowerCase().includes(nombre.toLowerCase()))
+      let obj = this.carroJson.filter(c => c.nombre.toLowerCase().includes(nombre.toLowerCase()))
       if (Object.keys(obj).length > 0){
         let nuevaCantidad = Number(cantidad) + Number(obj[0].cantidad);
-        for (var i in carroJson) {
-           if (carroJson[i].nombre === nombre) {
-               carroJson[i].cantidad = nuevaCantidad;
+        for (var i in this.carroJson) {
+           if (this.carroJson[i].nombre === nombre) {
+            this.carroJson[i].cantidad = nuevaCantidad;
            }
         }
       }
       else{
         let json = {nombre: nombre, cantidad: Number(cantidad)};
-        carroJson.push(json);
+        this.carroJson.push(json);
+        this.setState({
+          carro: this.carroJson
+        })
       }
       items[index].stock = stock - cantidad;
       this.props.addCount(cantidad);
     }
   }
 
-  render(){
-    let content;
-
-    if (this.state.show) {
-      content=<div className="card white">
-        <div className="card-content">
-          <span className="card-title gray-text text-lighten-2">Catálogo de productos</span>
-          <div className="buscar-box">
-            <label className="buscar-box-label">¿Qué estás buscando?</label>
-            <input id="buscar" type="text" name="buscar" placeholder="Buscar producto" />
-          </div>
-          <hr />
-
-          { this.listItems() }
-
-        </div>
-      </div>;
+  buscar(event){
+    const word=event.target.value;
+    if (word === ""){
+      this.setState(
+        {items: this.itemsOriginal}
+      );
     }
     else {
-      content=<div><Detalle nombre={this.state.detalle.nombre} stock={this.state.detalle.stock} imagen={this.state.detalle.imagen} precio={this.state.detalle.precio}/></div>;
+      this.setState(
+        {items: this.itemsOriginal.filter(c => c.nombre.toLowerCase().includes(word.toLowerCase()))}
+      )
+    }
+  }
+
+  render(){
+    let content;
+    let toShow = this.state.show;
+    if (this.props.show === "carro") {
+      toShow = this.props.show
+    }
+    
+    switch(toShow){
+      case "catalogo":
+        content=<div className="card white">
+          <div className="card-content">
+            <span className="card-title gray-text text-lighten-2">Catálogo de productos</span>
+            <div className="buscar-box">
+              <label className="buscar-box-label">¿Qué estás buscando?</label>
+              <input id="buscar" type="text" name="buscar" placeholder="Buscar producto" onKeyUp={this.buscar.bind(this)}/>
+            </div>
+            <hr />
+  
+            { this.listItems() }
+  
+          </div>
+        </div>;
+        break;
+      case "detalle":
+        content=<div><Detalle showCatalogo={this.showCatalogo.bind(this)} nombre={this.state.detalle.nombre} 
+          stock={this.state.detalle.stock} imagen={this.state.detalle.imagen} precio={this.state.detalle.precio}/></div>;
+        break;
+      case "carro":
+        content=<div><Carro cleanCatalog={this.cleanCatalog.bind(this)} showComponent={this.props.showComponent} 
+          itemsInCart={this.state.carro} items={this.state.items}/></div>;
+        break;
+      default:
+        content=<div>There was an error. Please try again later.</div>
+        break;
     }
 
     return (

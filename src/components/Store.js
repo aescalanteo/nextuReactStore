@@ -9,7 +9,8 @@ class Store extends React.Component{
       document.body.classList.remove("bg-login");
       document.body.classList.add("bg-main");
       this.state = {
-        count: 0
+        count: 0,
+        show: "catalogo"
       };
   }
 
@@ -18,14 +19,25 @@ class Store extends React.Component{
     this.setState({ count: sum })
   };
 
+  showComponent(componentName){
+    this.setState({
+      show: componentName
+    })
+  }
+
+  setCountToZero(){
+    this.setState({count:0})
+  }
+
   render(){
     return (
       <div className="container">
         <div className="row main">
-          <BarraSuperior count={this.state.count}></BarraSuperior>
+          <BarraSuperior showComponent={this.showComponent.bind(this)} count={this.state.count}></BarraSuperior>
           <div className="row">
               <div className="col m12">
-                  <Catalogo addCount={this.addCount.bind(this)}></Catalogo>
+                  <Catalogo setCountToZero={this.setCountToZero.bind(this)} addCount={this.addCount.bind(this)} 
+                    show={this.state.show} showComponent={this.showComponent.bind(this)}></Catalogo>
               </div>
           </div>
         </div>

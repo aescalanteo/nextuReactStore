@@ -12,7 +12,9 @@ class BarraSuperior extends React.Component{
   emptyCart(){
     if (this.props.count === 0) {
       alert("Carro de compras vacío. Agregue algunos productos primero.");
-    }
+    } else{
+      this.props.showComponent("carro");
+    }    
   }
 
   render(){
